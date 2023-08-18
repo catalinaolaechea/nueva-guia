@@ -1,0 +1,11 @@
+#include <iostream>
+//Leer una lista de 10 valores enteros listarlos por pantalla en sentido inverso al que ingresaron.//
+using namespace std;
+
+int main()
+{
+    int vecLista[]={1,2,3,4,5,6,7,8,9,10};
+    for (int i;i<10; i++)
+        cout<<vecLista [9-i]<<endl;
+    return 0;
+}
