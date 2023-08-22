@@ -1,0 +1,170 @@
+#include <stdio.h>
+#include <string.h>
+#include <iostream>
+#define TAM 2
+
+
+using namespace std;
+
+/* FUNCIONES DE AYUDA PARA LEER TEXTO DE MAS DE UNA PALABRA EN UN VECTOR DE CARACTERES */
+void  limpiarBufferTeclado()
+{
+    char c;
+    /*Lee cualquier caracter hasta un \n y luego lee un caracter y lo descarta*/
+    do
+        c= getc(stdin);
+    while (c=='\n');
+    if (c!='\n')
+     ungetc(c, stdin);
+    return;
+}
+
+void quitarSaltoLinea(char s[])
+{
+    s[strcspn(s, "\r\n")] = 0; 
+}
+/*************************************************************************************/
+
+struct libro
+{
+    int nroLibro = -1; //Si es -1 el libro no está cargado
+    char titulo[100];
+    char autor[40];
+    int agno;
+    int cantpaginas = 0; //Valor inicial del atributo
+    bool prestado = false;
+    unsigned int dniPrestado = -1; //Es prestado == false => dniPrestado == -1
+};
+
+void menu ()
+{
+    cout<<"1-ingresar un nuevo libro \n2-Buscar un libro \n3-prestar un libro \n4-Devolver un libro \n5-Motrar todos los libros cargados \n6- Salir"<<endl;
+}
+
+void ingresarDatosDeLibro(libro &l)
+{
+    cout << "Ingrese los datos del libro:" << endl;
+    cout << "Número de libro: ";
+    cin >> l.nroLibro;
+    cout << "Título: ";
+    limpiarBufferTeclado();
+    fgets(l.titulo, 100, stdin);
+    quitarSaltoLinea(l.titulo);
+    cout << "Autor: ";
+    limpiarBufferTeclado();
+    fgets(l.autor, 40, stdin);
+    quitarSaltoLinea(l.autor);
+    cout << "Año de publicación: ";
+    cin >> l.agno;
+    cout << "Cantidad de páginas: ";
+    cin >> l.cantpaginas;
+    return;
+}
+
+int cargarLibroEnVector(libro vec[], int tam)
+{   
+    int i=0;
+    while (i < tam && vec[i].nroLibro != -1)
+        i++;
+    if (i < tam)
+    {
+        ingresarDatosDeLibro(vec[i]);
+        return i;
+    }
+    return -1;
+}
+
+int BusquedaLibro(libro libro[], int tam,int buscado)
+{
+    unsigned i=0;
+    while (i<tam && libro[i].nroLibro!=buscado )
+    {
+        i++;
+    }
+    if(i==tam)
+    return -1;
+    else 
+    return i;
+}
+
+int prestarLibro(libro vlibros[] ,int variable, int dni)
+{
+    int i = variable;
+    if(i != -1 && vlibros[i].prestado==false)
+    {
+        vlibros[i].prestado = true;
+        vlibros[i].dniPrestado = dni;
+        return 1;
+    }
+    else 
+    return 0;
+}
+
+void devolverLibro(libro vlibros[] ,int i)
+{
+    vlibros[i].prestado=false;
+    vlibros[i].dniPrestado=-1;
+}
+
+int main()
+{
+    int opcion,nro,nro2,posicion,dni,resultado;
+    bool variable;
+    libro vlibros[TAM];
+    cout<<"Bievenido. Elija una opcion"<<endl;
+    menu();
+    cin>>opcion;
+    while (opcion>0 || opcion<5)
+    {
+        switch(opcion)
+        {
+            case 1:
+            int m;
+            m = cargarLibroEnVector(vlibros, TAM);
+            if (m >= 0)
+                cout << "Libro cargado exitosamente en la posición " << m << endl;
+            else
+                cout << "Error: no hay espacio para almacenar el libro." << endl;
+            break;
+            case 2:
+            cout<<"ingrese el numero del libro"<<endl;
+            cin>>nro;
+            posicion=BusquedaLibro(vlibros , TAM , nro);
+            if(posicion==-1)
+            cout<<"el numero ingresado no se encontró en la base de datos"<<endl;
+            else
+            cout<<"El libro "<<vlibros[posicion].titulo<<" se encuentra en la base de datos"<<endl;
+            break;
+            case 3:
+            cout<<"Ingrese el numero del libro que quiere perdir prestado"<<endl;
+            cin>>nro;
+            resultado=BusquedaLibro(vlibros , TAM , nro);
+            cout<<"Ingrese su dni"<<endl;
+            cin>>dni;
+            variable=prestarLibro(vlibros,resultado,dni);
+            if(variable)
+            cout<<"Se ha realizado el cambio con exito"<<endl;
+            else
+            cout<<"El libro no se encuentra disponible"<<endl;
+            break;
+            case 4: 
+            int i;
+            cout<<"ingrese el numero del libro el cual quiere devolver"<<endl;
+            cin>>nro;
+            i = BusquedaLibro(vlibros , TAM , nro);
+            devolverLibro(vlibros, i);
+            cout<<"la devolución ha salido exitosa"<<endl;
+            case 5:
+            for(int i=0; i<TAM ; i++)
+            {
+                if(vlibros[i].nroLibro > -1)
+                    cout<<vlibros[i].titulo<<"~~"<<vlibros[i].autor<<endl;
+            }
+            break;
+        }
+        menu();
+        cin>>opcion;
+    }
+    
+    return 0;
+}
