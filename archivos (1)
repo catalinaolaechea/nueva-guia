@@ -9,7 +9,7 @@ archivo, el número n lo informa al comienzo del programa. Al finalizar el progr
 todos los números guardados en el archivo.*/
 int main()
 {
-    int x;
+    float x;
     FILE *f;
     f=fopen("archivoCata", "wb");
     cout<<"ingrese la cantidad n de valores tipo float a ingresar"<<endl;
